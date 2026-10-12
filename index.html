@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusCampus OS - Smart Campus Platform</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor Styles: Leaflet Dark Map -->
+  <link rel="stylesheet" href="lib/leaflet.css">
+
+  <!-- Core App Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP HEADER BAR
+       ======================================================================== -->
+  <header class="top-header">
+    <!-- Brand -->
+    <div class="header-brand">
+      <div class="brand-icon-wrapper">
+        <div class="brand-radar-ring"></div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          NexusCampus OS
+          <span class="brand-badge">v2.6 Enterprise</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center Status & Server Clocks -->
+    <div class="header-center-info">
+      <!-- Live Status Badge -->
+      <div id="system-status-badge" class="system-status-pill operational">
+        <span id="system-status-dot" class="pulse-dot"></span>
+        <span id="system-status-text">🟢 All Systems Operational</span>
+      </div>
+
+      <!-- Live Dual Server Clock -->
+      <div class="server-clock-badge font-mono">
+        <div class="clock-item">
+          <span class="clock-label">UTC:</span>
+          <span id="clock-utc" class="clock-val">2026-10-07 22:36:15</span>
+        </div>
+        <span style="color: #334155;">|</span>
+        <div class="clock-item">
+          <span class="clock-label">LOCAL:</span>
+          <span id="clock-local" class="clock-val">22:36:15</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Header Actions (Role Switcher & User Profile) -->
+    <div class="header-actions">
+      <!-- Role Switcher Toggle -->
+      <div class="role-switcher-container">
+        <button class="role-btn active" data-role="student" title="Alex Mercer (Student)">
+          <span>🎓</span> Student
+        </button>
+        <button class="role-btn" data-role="faculty" title="Dr. Evelyn Reed (Faculty)">
+          <span>🔬</span> Faculty
+        </button>
+        <button class="role-btn" data-role="admin" title="Marcus Vance (Facilities Admin)">
+          <span>🛡️</span> Admin
+        </button>
+      </div>
+
+      <!-- User Profile Dropdown Toggle -->
+      <div class="user-profile-menu">
+        <button id="user-profile-toggle-btn" class="user-profile-btn">
+          <img id="header-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Avatar" class="user-avatar-img">
+          <div style="text-align: left; line-height: 1.2;">
+            <div id="header-user-name" style="font-size: 0.8rem; font-weight: 700; color: #fff;">Alex Mercer</div>
+            <div id="header-user-role" style="font-size: 0.65rem; color: var(--cyan-light); font-weight: 600;">STUDENT</div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="user-profile-dropdown" class="user-profile-dropdown">
+          <div style="display: flex; gap: 10px; align-items: center; border-bottom: 1px solid var(--border-card); padding-bottom: 12px; margin-bottom: 12px;">
+            <div style="line-height: 1.3;">
+              <div id="dropdown-name" style="font-weight: 700; color: #fff; font-size: 0.9rem;">Alex Mercer</div>
+              <div id="dropdown-email" style="font-size: 0.72rem; color: var(--text-muted);">alex.mercer@nexus.edu</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.76rem; color: var(--text-secondary); margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span>Student / Staff ID:</span>
+              <strong id="dropdown-id" class="font-mono" style="color: var(--cyan-light);">STU-88219</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Role:</span>
+              <strong id="dropdown-role" style="color: var(--emerald-light);">STUDENT</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Department:</span>
+              <strong id="dropdown-dept" style="color: #cbd5e1; text-align: right;">Robotics</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Security Clearance:</span>
+              <strong id="dropdown-clearance" style="color: #f59e0b;">Level 2</strong>
+            </div>
+          </div>
+          <button onclick="NexusApp.navigateTo('settings')" class="btn-secondary" style="width: 100%; font-size: 0.75rem; padding: 6px 12px;">
+            ⚙️ System & Security Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MAIN APP CONTAINER (SIDEBAR + MAIN CONTENT)
+       ======================================================================== -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div>
+        <div class="nav-group-title">Navigation Framework</div>
+        <ul class="nav-list">
+          <li>
+            <a href="#dashboard" class="nav-link active" data-target="dashboard">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              <span>Dashboard</span>
+              <span class="nav-badge">Live</span>
+            </a>
+          </li>
+          <li>
+            <a href="#gate-pass" class="nav-link" data-target="gate-pass">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Gate Pass & Security</span>
+              <span class="nav-badge" style="color: var(--emerald-light); border-color: rgba(16,185,129,0.4);">TOTP</span>
+            </a>
+          </li>
+          <li>
+            <a href="#campus-map" class="nav-link" data-target="campus-map">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+              <span>Campus Map</span>
+              <span class="nav-badge">GIS A*</span>
+            </a>
+          </li>
+          <li>
+            <a href="#ai-copilot" class="nav-link" data-target="ai-copilot">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+              <span>AI Copilot</span>
+              <span class="nav-badge" style="background: rgba(129,140,248,0.2); color: #818cf8; border-color: rgba(129,140,248,0.4);">v2.6</span>
+            </a>
+          </li>
+          <li>
+            <a href="#facilities" class="nav-link" data-target="facilities">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+              <span>Facility Booking</span>
+            </a>
+          </li>
+          <li>
+            <a href="#attendance" class="nav-link" data-target="attendance">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+              <span>Attendance Tracker</span>
+            </a>
+          </li>
+          <li>
+            <a href="#settings" class="nav-link" data-target="settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>System Settings</span>
+              <span class="nav-badge">SQL</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Footer Info Card -->
+      <div class="sidebar-footer-card">
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">Node Connection:</div>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--cyan-light); font-weight: 600;">
+          <span class="pulse-dot"></span> us-west.campus-node-01
+        </div>
+        <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 6px;">
+          Latency: <span class="font-mono" style="color: var(--emerald-light);">4.2 ms</span> • Zero-Trust Mesh
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Views Area -->
+    <main class="main-content">
+
+      <!-- ====================================================================
+           MODULE A VIEW: REAL-TIME IOT TELEMETRY DASHBOARD
+           ==================================================================== -->
+      <section id="view-dashboard" class="view-section active">
+        <!-- Page Header -->
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Real-Time IoT Telemetry Dashboard
+            </h2>
+            <p class="page-subtitle">Sub-second sensor streams, energy optimization grid, and campus perimeter telemetry</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button onclick="NexusApp.navigateTo('gate-pass')" class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+              My Gate Pass (TOTP)
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Metric Cards -->
+        <div class="metrics-grid">
+          <!-- Card 1: Power -->
+          <div class="glass-panel metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Total Campus Power</span>
+              <div class="metric-icon-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+            </div>
+            <div class="metric-body">
+              <span id="metric-val-power" class="metric-value">412.5</span>
+              <span class="metric-unit">kWh</span>
+            </div>
+            <div class="metric-trend down-good">
+              <span>▼ 4.8% vs Peak Hour</span> • Substation 2
+            </div>
+          </div>
+
+          <!-- Card 2: Occupancy -->
+          <div class="glass-panel metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Active Campus Occupancy</span>
+              <div class="metric-icon-badge" style="color: #34d399; background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            <div class="metric-body">
+              <span id="metric-val-occupancy" class="metric-value">78%</span>
+              <span class="metric-unit">(3,420 / 4,400)</span>
+            </div>
+            <div class="metric-trend up-good">
+              <span>● Normal Capacity Distribution</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Air Quality CO2 -->
+          <div class="glass-panel metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Air Quality CO2</span>
+              <div class="metric-icon-badge" style="color: #38bdf8; background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.3);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+              </div>
+            </div>
+            <div class="metric-body">
+              <span id="metric-val-co2" class="metric-value">420 ppm</span>
+            </div>
+            <div id="metric-status-co2" class="metric-trend up-good">
+              Good (Optimal Ventilation)
+            </div>
+          </div>
+
+          <!-- Card 4: Gate Scans Today -->
+          <div class="glass-panel metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Gate Scans Today</span>
+              <div class="metric-icon-badge" style="color: #f59e0b; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+              </div>
+            </div>
+            <div class="metric-body">
+              <span id="metric-val-scans" class="metric-value">1,240</span>
+              <span class="metric-unit">entries</span>
+            </div>
+            <div class="metric-trend up-good">
+              <span>● 100% Zero-Trust Verified</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Main Row (Dual-Axis Chart & Quick Admin Actions) -->
+        <div class="telemetry-row">
+          <!-- Dual-Axis Telemetry Graph -->
+          <div class="glass-panel chart-card">
+            <div class="chart-header">
+              <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff;">
+                  Animated Dual-Axis Telemetry Graph
+                </h3>
+                <p style="font-size: 0.76rem; color: var(--text-muted);">
+                  Live stream (updates every 3 seconds): Energy Consumption (kWh) vs. Room Occupancy (%)
+                </p>
+              </div>
+              <div class="chart-timeframe-toggles">
+                <button class="time-btn active">Live (3s)</button>
+                <button class="time-btn">1 Hour</button>
+                <button class="time-btn">6 Hours</button>
+                <button class="time-btn">24 Hours</button>
+              </div>
+            </div>
+            <div class="chart-canvas-container">
+              <canvas id="telemetry-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Quick Admin Action Buttons -->
+          <div class="glass-panel admin-actions-card">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <h3 style="font-size: 1rem; font-weight: 700; color: #fff;">Quick Admin Actions</h3>
+                <span class="nav-badge" style="font-size: 0.65rem;">Admin Access</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted);">
+                Instant campus-wide protocol commands with audit logging
+              </p>
+            </div>
+
+            <div class="admin-action-btn-group">
+              <!-- Action 1: Power Saver Mode -->
+              <button id="btn-power-saver" class="cyber-action-btn power-saver">
+                <div class="btn-info-col">
+                  <span class="btn-title">⚡ Power Saver Mode</span>
+                  <span class="btn-desc">Dims lights & throttles HVAC in unbooked facilities (-28% load)</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+
+              <!-- Action 2: Emergency Lockdown -->
+              <button id="btn-lockdown" class="cyber-action-btn lockdown">
+                <div class="btn-info-col">
+                  <span class="btn-title">🚨 Emergency Lockdown</span>
+                  <span class="btn-desc">Perimeter gate closure alert, seals all digital turnstiles</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+
+              <!-- Action 3: HVAC Boost -->
+              <button id="btn-hvac-boost" class="cyber-action-btn hvac-boost">
+                <div class="btn-info-col">
+                  <span class="btn-title">💨 HVAC Boost</span>
+                  <span class="btn-desc">Directs chilled airflow to high-occupancy lab zones</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+
+            <div style="margin-top: auto; padding: 10px; background: rgba(3,7,18,0.5); border-radius: 8px; border: 1px solid var(--border-card); font-size: 0.72rem; color: var(--text-muted);">
+              💡 <b>Tip:</b> Switch to <b>Facilities Admin</b> via the top right role toggle to trigger lockdown or power saver protocols.
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Sensor Event Log -->
+        <div class="glass-panel sensor-stream-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                <span class="pulse-dot"></span> Live Sensor Event Stream
+              </h3>
+              <p style="font-size: 0.75rem; color: var(--text-muted);">Real-time IoT audit log streaming from campus telemetry microservices</p>
+            </div>
+            <div class="stream-controls">
+              <button id="btn-stream-toggle" class="btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;">
+                ⏸ Pause Stream
+              </button>
+            </div>
+          </div>
+          <div id="stream-log-container" class="stream-log-container">
+            <!-- Entries dynamically prepended -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODULE B VIEW: ZERO-TRUST GATE PASS & SECURITY
+           ==================================================================== -->
+      <section id="view-gate-pass" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Zero-Trust Gate Pass & Security Console
+            </h2>
+            <p class="page-subtitle">Auto-refreshing HMAC-SHA1 QR pass with anti-screenshot holography and Haversine geofencing</p>
+          </div>
+          <div>
+            <button id="btn-open-scanner-modal" class="btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Simulate Gate Camera Scan 📷
+            </button>
+          </div>
+        </div>
+
+        <div class="security-pass-grid">
+          <!-- Pass Card Container -->
+          <div class="glass-panel totp-card">
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-card); padding-bottom: 12px;">
+              <div style="text-align: left;">
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Nexus Digital Credential</div>
+                <div style="font-size: 1.1rem; font-weight: 800; color: #fff;">Smart Gate Pass</div>
+              </div>
+              <span class="nav-badge" style="background: rgba(16,185,129,0.15); color: var(--emerald-light); border-color: rgba(16,185,129,0.4);">
+                ACTIVE PASS
+              </span>
+            </div>
+
+            <!-- Dynamic QR Code Container with Anti-Screenshot Watermark -->
+            <div class="qr-code-wrapper">
+              <div id="qrcode-canvas-container">
+                <!-- QR Code rendered via QRCode.js -->
+              </div>
+
+              <!-- Holographic Anti-Screenshot Watermark Overlay -->
+              <div class="security-watermark-overlay">
+                <div class="watermark-scanline"></div>
+                <div class="watermark-row">
+                  <span class="watermark-text-item">Alex Mercer • STU-88219 • 2026-10-07</span>
+                  <span class="watermark-text-item">Alex Mercer • STU-88219 • 2026-10-07</span>
+                </div>
+                <div class="watermark-row">
+                  <span class="watermark-text-item">Alex Mercer • STU-88219 • 2026-10-07</span>
+                  <span class="watermark-text-item">Alex Mercer • STU-88219 • 2026-10-07</span>
+                </div>
+                <div class="watermark-row">
+                  <span class="watermark-text-item">Alex Mercer • STU-88219 • 2026-10-07</span>
+                  <span class="watermark-text-item">Alex Mercer • STU-88219 • 2026-10-07</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TOTP Digits Display -->
+            <div>
+              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                Dynamic 30s HMAC-SHA1 Token
+              </div>
+              <div id="totp-digits-display" class="font-mono" style="font-size: 1.8rem; font-weight: 800; letter-spacing: 0.15em; color: var(--cyan-light);">
+                --- ---
+              </div>
+            </div>
+
+            <!-- High-Precision 30s Progress Bar -->
+            <div class="countdown-container">
+              <div class="countdown-labels">
+                <span>Refresh Cycle (RFC 6238)</span>
+                <span id="countdown-seconds-label" class="font-mono" style="font-weight: 700; color: var(--cyan-light);">30s</span>
+              </div>
+              <div class="countdown-bar-outer">
+                <div id="countdown-bar-fill" class="countdown-bar-fill"></div>
+              </div>
+            </div>
+
+            <div style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.4;">
+              Pass signed with Zero-Trust Device Certificate • Valid across all North, West & Quad turnstiles
+            </div>
+          </div>
+
+          <!-- Security Details & Geofence Validator -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Geofence Validator Card -->
+            <div class="glass-panel geofence-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  Geofence Distance Validator (Haversine Formula)
+                </h3>
+              </div>
+              
+              <div>
+                <div id="geofence-status-badge" class="geofence-badge verified">
+                  🟢 Geofence Verified within 12m
+                </div>
+                <p id="geofence-distance-desc" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px;">
+                  Client coordinates verified against Gate North Perimeter. Physical entry permitted.
+                </p>
+              </div>
+
+              <!-- Interactive Simulator Slider/Toggle -->
+              <div class="geofence-sim-toggle">
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 600; color: #fff;">Simulate Location Outside Perimeter</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Test security lock when user is outside campus boundary (>50m)</div>
+                </div>
+                <label class="cyber-toggle">
+                  <input type="checkbox" id="geofence-sim-checkbox">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div style="background: rgba(3,7,18,0.6); padding: 14px; border-radius: 8px; border: 1px solid var(--border-card); font-family: var(--font-mono); font-size: 0.75rem; color: #94a3b8; line-height: 1.6;">
+                <div style="color: var(--cyan-light); font-weight: 700; margin-bottom: 4px;">// Geofence Coordinate Spec</div>
+                <div>Campus Datum: <span style="color: #fff;">37.774929 N, -122.419416 W</span></div>
+                <div>Permitted Radius: <span style="color: var(--emerald-light);">≤ 50.0 meters</span></div>
+                <div>Calculated Distance: <span class="font-mono" style="color: var(--cyan-light);">d = 2R · asin(√[sin²(Δφ/2) + cos φ₁ cos φ₂ sin²(Δλ/2)])</span></div>
+              </div>
+            </div>
+
+            <!-- Zero-Trust Security Specification Card -->
+            <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #fff;">Zero-Trust Architecture Highlights</h4>
+              <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.8rem; color: var(--text-secondary);">
+                <li style="display: flex; align-items: flex-start; gap: 10px;">
+                  <span style="color: var(--cyan-light);">🔒</span>
+                  <div><b>Ephemeral Tokens:</b> QR payload changes every 30 seconds, defeating replay attacks.</div>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 10px;">
+                  <span style="color: var(--emerald-light);">✨</span>
+                  <div><b>Anti-Screenshot Hologram:</b> Real-time moving diagonal scanlines and milliseconds watermark prevent screen grab sharing.</div>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 10px;">
+                  <span style="color: var(--amber-primary);">📍</span>
+                  <div><b>Continuous Location Attestation:</b> Device GPS coordinates are cryptographically hashed into the gate verification payload.</div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODULE C VIEW: GEOSPATIAL GIS & MULTI-FLOOR CAMPUS MAP
+           ==================================================================== -->
+      <section id="view-campus-map" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+              Geospatial GIS & Multi-Floor Campus Map
+            </h2>
+            <p class="page-subtitle">Dark vector layout, indoor floor overlays, step-free accessibility, and A* pathfinding routing</p>
+          </div>
+        </div>
+
+        <div class="map-view-layout">
+          <!-- Interactive Map Container -->
+          <div class="glass-panel map-container-card">
+            <!-- Floating Floor Switcher & Accessibility Controls -->
+            <div class="map-floating-controls">
+              <div class="floating-pill-panel">
+                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 4px;">Floor:</span>
+                <button class="floor-btn active" data-floor="0">Ground</button>
+                <button class="floor-btn" data-floor="1">Floor 1</button>
+                <button class="floor-btn" data-floor="2">Floor 2</button>
+                <button class="floor-btn" data-floor="3">Floor 3</button>
+              </div>
+            </div>
+
+            <!-- Legend Overlay -->
+            <div class="map-legend">
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #06b6d4; box-shadow: 0 0 6px #06b6d4;"></span>
+                <span>Security / Gates</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #22d3ee; box-shadow: 0 0 6px #22d3ee;"></span>
+                <span>Robotics / Labs</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+                <span>Cyber Library</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span>
+                <span>Dining Commons</span>
+              </div>
+            </div>
+
+            <!-- Map Target Element -->
+            <div id="campus-map-element"></div>
+          </div>
+
+          <!-- A* Pathfinding Sidebar Panel -->
+          <div class="glass-panel pathfinder-panel">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 4px;">
+                A* Pathfinding Navigator
+              </h3>
+              <p style="font-size: 0.74rem; color: var(--text-muted);">
+                Autonomous shortest-path routing with real obstacle & accessibility checks
+              </p>
+            </div>
+
+            <!-- Origin Selector -->
+            <div class="pathfinder-input-group">
+              <label style="font-size: 0.75rem; font-weight: 600; color: var(--cyan-light);">Origin Waypoint</label>
+              <select id="route-origin-select" class="cyber-select">
+                <option value="gate-main" selected>🛡️ Main Security Gate</option>
+                <option value="transit-hub">🚆 West Autonomous Transit Hub</option>
+                <option value="library-g">📚 Central Library - Ground</option>
+                <option value="quad-plaza">🏛️ Central Cyber Quad Plaza</option>
+                <option value="robotics-g">🤖 Turing Robotics Complex</option>
+                <option value="quantum-lab">🔬 Quantum Computing Lab</option>
+                <option value="bistro-404">☕ Bistro 404 & Dining</option>
+              </select>
+            </div>
+
+            <!-- Destination Selector -->
+            <div class="pathfinder-input-group">
+              <label style="font-size: 0.75rem; font-weight: 600; color: var(--emerald-light);">Destination Waypoint</label>
+              <select id="route-dest-select" class="cyber-select">
+                <option value="robotics-f2" selected>🤖 Robotics Lab B - Floor 2</option>
+                <option value="library-f1">📚 Library Pod 104 - Floor 1</option>
+                <option value="bistro-404">☕ Bistro 404 & Dining</option>
+                <option value="quantum-lab">🔬 Quantum Computing Lab</option>
+                <option value="transit-hub">🚆 West Transit Hub</option>
+                <option value="gate-main">🛡️ Main Security Gate</option>
+              </select>
+            </div>
+
+            <!-- Step-Free Accessibility Toggle -->
+            <div class="accessibility-switch-card">
+              <div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 6px;">
+                  ♿ Step-Free Accessible
+                </div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">
+                  Reroutes via ramps & elevators only
+                </div>
+              </div>
+              <label class="cyber-toggle">
+                <input type="checkbox" id="step-free-toggle">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <button id="btn-calculate-route" class="btn-primary" style="width: 100%;">
+              ⚡ Calculate A* Route
+            </button>
+
+            <!-- Route Result Telemetry Card -->
+            <div id="route-result-telemetry" class="route-telemetry-result" style="display: none;">
+              <div style="font-size: 0.76rem; font-weight: 700; color: #fff; display: flex; justify-content: space-between;">
+                <span>Route Telemetry</span>
+                <span id="route-stat-access" style="font-size: 0.7rem;"></span>
+              </div>
+              <div class="route-stats-grid">
+                <div class="route-stat-box">
+                  <div id="route-stat-distance" class="route-stat-val">340 m</div>
+                  <div class="route-stat-lbl">Distance</div>
+                </div>
+                <div class="route-stat-box">
+                  <div id="route-stat-time" class="route-stat-val">4.2 min</div>
+                  <div class="route-stat-lbl">Walk Time</div>
+                </div>
+                <div class="route-stat-box">
+                  <div id="route-stat-steps" class="route-stat-val">446</div>
+                  <div class="route-stat-lbl">Steps</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODULE D VIEW 1: AI COPILOT
+           ==================================================================== -->
+      <section id="view-ai-copilot" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/><path d="M12 8V4H8"/></svg>
+              Nexus AI Autonomous Copilot (v2.6)
+            </h2>
+            <p class="page-subtitle">Autonomous smart campus assistant with IoT triage, natural voice synthesis, and command execution</p>
+          </div>
+          <div>
+            <button id="btn-toggle-tts" class="btn-secondary" style="font-size: 0.78rem;">
+              🔈 Audio Voice: OFF
+            </button>
+          </div>
+        </div>
+
+        <div class="copilot-container">
+          <!-- Chat Card -->
+          <div class="glass-panel copilot-chat-card">
+            <div id="copilot-messages-container" class="copilot-messages-area">
+              <!-- Dynamically populated bubbles -->
+            </div>
+            <div class="chat-input-bar">
+              <input id="copilot-input-box" type="text" class="cyber-input" placeholder="Ask Copilot (e.g. 'Run security audit', 'Find study space with low CO2')...">
+              <button id="btn-send-copilot" class="btn-primary" style="padding: 10px 18px;">
+                Send ➔
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Action Prompts Panel -->
+          <div class="glass-panel quick-prompts-panel">
+            <h4 style="font-size: 0.85rem; font-weight: 700; color: #fff;">Quick Command Presets</h4>
+            <button class="prompt-chip" data-prompt="Run Campus Security Audit">
+              🛡️ Run Campus Security Audit
+            </button>
+            <button class="prompt-chip" data-prompt="Find quiet study space with CO2 < 400ppm">
+              🍃 Find quiet study space with CO2 &lt; 400ppm
+            </button>
+            <button class="prompt-chip" data-prompt="Engage Power Saver Mode">
+              ⚡ Engage Power Saver Mode
+            </button>
+            <button class="prompt-chip" data-prompt="Navigate from Main Gate to Robotics Lab">
+              🗺️ Navigate: Main Gate ➔ Robotics Lab B
+            </button>
+            <button class="prompt-chip" data-prompt="Check my attendance rate for today">
+              📝 Check my course attendance rate
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODULE D VIEW 2: FACILITY BOOKING
+           ==================================================================== -->
+      <section id="view-facilities" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/></svg>
+              Facility Booking & Resource Reservation
+            </h2>
+            <p class="page-subtitle">Real-time room occupancy, capacity validation, and energy-aware facility scheduling</p>
+          </div>
+          <!-- Filters -->
+          <div style="display: flex; gap: 10px;">
+            <select id="facility-type-filter" class="cyber-select" style="width: auto;">
+              <option value="all">All Room Types</option>
+              <option value="lab">Laboratories</option>
+              <option value="study_room">Study Rooms</option>
+              <option value="hall">Halls & Auditoriums</option>
+              <option value="conference">Conference</option>
+            </select>
+            <select id="facility-status-filter" class="cyber-select" style="width: auto;">
+              <option value="all">All Statuses</option>
+              <option value="available">Available Only</option>
+              <option value="occupied">Occupied</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="facilities-grid-container" class="facilities-grid">
+          <!-- Rendered by facilities.js -->
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODULE D VIEW 3: ATTENDANCE TRACKER
+           ==================================================================== -->
+      <section id="view-attendance" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Smart Geofence Attendance Tracker
+            </h2>
+            <p id="attendance-role-info" class="page-subtitle">Student Attendance Verification Console for Alex Mercer (STU-88219)</p>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; background: rgba(16,185,129,0.15); border: 1px solid var(--emerald-primary); padding: 8px 16px; border-radius: 10px;">
+              <span style="font-size: 0.8rem; color: #cbd5e1;">Semester Attendance Rate:</span>
+              <strong style="color: var(--emerald-light); font-size: 1.1rem; font-family: var(--font-mono);">94.2%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="attendance-layout">
+          <!-- Check-In Action Card -->
+          <div class="glass-panel" style="padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff;">1-Click Geofence Check-In</h3>
+            <p style="font-size: 0.78rem; color: var(--text-muted);">
+              Authenticates student presence via GPS Haversine verification before granting attendance credit.
+            </p>
+
+            <div class="pathfinder-input-group">
+              <label style="font-size: 0.75rem; font-weight: 600; color: var(--cyan-light);">Select Course</label>
+              <select id="attendance-course-select" class="cyber-select">
+                <option value="ROB-420">ROB-420: Autonomous Robotics (Turing Complex)</option>
+                <option value="CYBER-501">CYBER-501: Zero-Trust Defense (Arena 302)</option>
+                <option value="AI-301">AI-301: Deep Neural Architectures (Cyber Pods)</option>
+              </select>
+            </div>
+
+            <div style="background: rgba(3,7,18,0.6); padding: 12px; border-radius: 8px; border: 1px solid var(--border-card); font-size: 0.75rem; color: #94a3b8;">
+              <div>Status: <span style="color: var(--emerald-light); font-weight: 600;">Geofence Verified (within 12m)</span></div>
+              <div style="margin-top: 4px;">Anti-Spoofing: Hardware Device Fingerprint Validated</div>
+            </div>
+
+            <button id="btn-perform-checkin" class="btn-primary" style="width: 100%;">
+              ✅ Verify GPS & Check In Now
+            </button>
+          </div>
+
+          <!-- Attendance Logs Table -->
+          <div class="glass-panel" style="padding: 20px; overflow-x: auto;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 12px;">Verified Attendance Records</h3>
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th>Course Code</th>
+                  <th>Course Title</th>
+                  <th>Check-In Timestamp</th>
+                  <th>Geofence Status</th>
+                  <th>Log UUID</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-logs-tbody">
+                <!-- Dynamically populated by attendance.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           MODULE D VIEW 4: SYSTEM SETTINGS & SUPABASE SQL STUDIO
+           ==================================================================== -->
+      <section id="view-settings" class="view-section">
+        <div class="page-header-row">
+          <div>
+            <h2 class="page-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M4 7V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><rect width="20" height="15" x="2" y="7" rx="2"/></svg>
+              Database Schema & Supabase SQL Studio
+            </h2>
+            <p class="page-subtitle">Production PostgreSQL DDL, Row-Level Security (RLS) policies, and interactive query sandbox</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-copy-schema-sql" class="btn-primary">
+              📋 Copy SQL DDL
+            </button>
+            <button id="btn-download-schema-sql" class="btn-secondary">
+              ⬇ Download schema.sql
+            </button>
+          </div>
+        </div>
+
+        <!-- Schema Highlights Grid -->
+        <div class="metrics-grid">
+          <div class="glass-panel" style="padding: 16px;">
+            <div style="font-size: 0.75rem; color: var(--cyan-light); font-weight: 700;">TABLE: users</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">id (UUID), email, full_name, role, avatar_url, student_id</div>
+          </div>
+          <div class="glass-panel" style="padding: 16px;">
+            <div style="font-size: 0.75rem; color: var(--cyan-light); font-weight: 700;">TABLE: buildings</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">id (UUID), code, name, location_lat, location_lng, occupancy_pct, power_usage_kwh</div>
+          </div>
+          <div class="glass-panel" style="padding: 16px;">
+            <div style="font-size: 0.75rem; color: var(--cyan-light); font-weight: 700;">TABLE: facilities</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">id (UUID), building_id, name, type, capacity, status, current_co2, current_temp</div>
+          </div>
+          <div class="glass-panel" style="padding: 16px;">
+            <div style="font-size: 0.75rem; color: var(--cyan-light); font-weight: 700;">TABLE: gate_passes</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">id (UUID), user_id, secret_token, valid_until, status (active, expired, used)</div>
+          </div>
+          <div class="glass-panel" style="padding: 16px;">
+            <div style="font-size: 0.75rem; color: var(--cyan-light); font-weight: 700;">TABLE: sensor_telemetry</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">id (BIGSERIAL), building_id, sensor_type, value, timestamp (Time-Series)</div>
+          </div>
+          <div class="glass-panel" style="padding: 16px;">
+            <div style="font-size: 0.75rem; color: var(--cyan-light); font-weight: 700;">TABLE: attendance_logs</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">id (UUID), student_id, course_code, check_in_time, geofence_verified (boolean)</div>
+          </div>
+        </div>
+
+        <!-- SQL Query Sandbox -->
+        <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem; font-weight: 700; color: #fff;">Interactive SQL Sandbox</h3>
+            <span style="font-size: 0.72rem; color: var(--emerald-light);">Connected: PostgreSQL 15.4 / Supabase Engine</span>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <input id="sql-query-input" type="text" class="cyber-input font-mono" value="SELECT * FROM buildings ORDER BY power_usage_kwh DESC;" placeholder="Enter SQL query...">
+            <button id="btn-run-sql" class="btn-primary" style="padding: 10px 18px;">
+              ▶ Execute SQL
+            </button>
+          </div>
+
+          <div id="sql-query-output" style="background: rgba(3,7,18,0.7); border: 1px solid var(--border-card); border-radius: 8px; padding: 14px; min-height: 120px; overflow-x: auto; font-family: var(--font-mono); font-size: 0.75rem;">
+            <div style="color: var(--text-muted);">Execute query above to inspect sample database records or test RLS policies.</div>
+          </div>
+        </div>
+
+        <!-- System Controls -->
+        <div class="glass-panel" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: #fff;">Web Audio Sound Effects</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">Auditory feedback for scans, alarms, clicks</div>
+            </div>
+            <label class="cyber-toggle">
+              <input type="checkbox" id="setting-audio-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div>
+            <button id="btn-reset-demo-state" class="btn-secondary" style="font-size: 0.75rem;">
+              🔄 Reset Demo State & Telemetry
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: GUARD CAMERA SCANNER SIMULATOR (MODULE B)
+       ======================================================================== -->
+  <div id="guard-scanner-modal" class="modal-backdrop">
+    <div class="cyber-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Turnstile Optical Scanner • Gate North-B04
+        </div>
+        <button id="btn-close-scanner-modal" class="modal-close-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="camera-feed-sim">
+          <div class="camera-scan-beam"></div>
+          <div class="camera-hud-box">
+            <span class="hud-corner top-left"></span>
+            <span class="hud-corner top-right"></span>
+            <span class="hud-corner bottom-left"></span>
+            <span class="hud-corner bottom-right"></span>
+            <span style="font-family: var(--font-mono); font-size: 10px; color: var(--cyan-light); letter-spacing: 0.1em;">ALIGN QR PASS</span>
+          </div>
+        </div>
+
+        <button id="btn-trigger-camera-scan" class="btn-primary" style="width: 100%; font-size: 0.9rem;">
+          📷 Trigger Instant Optical Scan
+        </button>
+
+        <div id="scanner-auth-result" style="width: 100%;">
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center;">
+            Align Nexus Pass QR code within scanning brackets to simulate turnstile gate verification.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: FACILITY BOOKING RESERVATION (MODULE D)
+       ======================================================================== -->
+  <div id="booking-reservation-modal" class="modal-backdrop">
+    <div class="cyber-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>⚡ Facility Reservation Confirmation</span>
+        </div>
+        <button id="btn-close-booking-modal" class="modal-close-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="align-items: stretch;">
+        <div>
+          <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Reserving Facility:</div>
+          <div id="booking-target-facility-name" style="font-size: 1.15rem; font-weight: 700; color: #fff;">Robotics Lab B</div>
+          <div id="booking-target-capacity" style="font-size: 0.78rem; color: var(--cyan-light);">28 seats max</div>
+        </div>
+
+        <div class="pathfinder-input-group">
+          <label style="font-size: 0.75rem; color: #cbd5e1;">Time Slot</label>
+          <select class="cyber-select">
+            <option>Today: 14:00 - 16:00 (Next Available)</option>
+            <option>Today: 16:30 - 18:30</option>
+            <option>Tomorrow: 09:00 - 11:00</option>
+          </select>
+        </div>
+
+        <div class="pathfinder-input-group">
+          <label style="font-size: 0.75rem; color: #cbd5e1;">Attendee Count (Capacity Check)</label>
+          <input id="booking-attendee-count" type="number" class="cyber-input" value="6" min="1" max="100">
+        </div>
+
+        <button id="btn-confirm-reservation" class="btn-primary" style="margin-top: 10px;">
+          Confirm Booking & Update Grid
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- ========================================================================
+       SCRIPTS ARCHITECTURE
+       ======================================================================== -->
+  <!-- Vendor Libraries -->
+  <script src="lib/qrcode.min.js"></script>
+  <script src="lib/leaflet.js"></script>
+  <script src="lib/chart.umd.min.js"></script>
+  <script src="lib/lucide.min.js"></script>
+
+  <!-- Application Modules -->
+  <script src="js/app.js"></script>
+  <script src="js/telemetry.js"></script>
+  <script src="js/security.js"></script>
+  <script src="js/campus-map.js"></script>
+  <script src="js/ai-copilot.js"></script>
+  <script src="js/facilities.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/schema-viewer.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "smaretcampussss",
+  "version": "1.0.0",
+  "description": "NexusCampus OS - Smart Campus Web Application & Management Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "python server.py",
+    "build": "echo 'Build complete - static assets and serverless functions ready'"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "smaretcampussss",
+    "smart-campus",
+    "iot-telemetry",
+    "totp-security",
+    "gis-map",
+    "vercel"
+  ],
+  "author": "Nexus Team",
+  "license": "MIT"
+}
