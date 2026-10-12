@@ -1,7 +1,7 @@
 {
   "name": "smaretcampussss",
   "version": 2,
-  "outputDirectory": "public",
+  "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [

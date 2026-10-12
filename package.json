@@ -4,8 +4,7 @@
   "description": "NexusCampus OS - Smart Campus Web Application & Management Platform",
   "main": "index.html",
   "scripts": {
-    "start": "python server.py",
-    "build": "echo 'Build complete - static assets and serverless functions ready'"
+    "start": "python server.py"
   },
   "dependencies": {},
   "devDependencies": {},

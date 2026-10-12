@@ -279,7 +279,7 @@ class NexusRequestHandler(SimpleHTTPRequestHandler):
         cursor = conn.cursor()
 
         try:
-            if path == "/api/status":
+            if path in ["/api/status", "/api/health"]:
                 # Fetch settings
                 cursor.execute("SELECT key, value FROM system_settings;")
                 settings = dict(cursor.fetchall())

@@ -1,2 +1,3 @@
-# smaretcampussss - Vercel Python Runtime Dependencies
-# Standard Library provides sqlite3, http.server, urllib, and json natively.
+# smaretcampussss - Vercel Python Serverless Dependencies
+requests>=2.31.0
+urllib3>=2.0.0
